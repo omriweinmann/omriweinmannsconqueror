@@ -1,6 +1,7 @@
-class Localization:
-    def __init__(self, array):
-        self.array = array
+class Coordinate:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
         
 language = "En"
         
@@ -91,6 +92,7 @@ localization = {
     "cul_isl" : {"En" : "Islamic", "Sp" : "Islam"},
 }
 
+"""
 start = [
     [
         "_ _ _ _ _ d d s s _ _ r r r r +",
@@ -111,7 +113,17 @@ start = [
         "x + + + + + + + + + + o o o _ _"
     ]
 ]
+"""
 
+
+start = [
+    [
+        "_ e _ o",
+        "+ e t o",
+        "_ _ _ _",
+        "_ _ _ e"
+    ]
+]
 def get_localed(key):
     return localization[key][language]
     
@@ -148,14 +160,110 @@ factions = {
     "m" : Faction("m", "mor", Attributes("cul_isl",2))
 }
 
+faction = ""
+
+def get_keys(dictionary):
+    return list(dictionary.keys())
+
 def get_faction_local(idl,key):
     return get_dual_localed(factions[idl].namedef, key)
     
-print(get_faction_local("†", "name")) # prints "Papal States"
-print(get_faction_local("t", "adj")) # prints "Portuguese"
-print(get_faction_local("e", "idu")) # prints "E"
-print(get_faction_local("o", "idl")) # prints "o"
+#print(get_faction_local("†", "name")) # prints "Papal States"
+#print(get_faction_local("t", "adj")) # prints "Portuguese"
+#print(get_faction_local("e", "idu")) # prints "E"
+#print(get_faction_local("o", "idl")) # prints "o"
 
+class Province:
+    def __init__(self, owner, potential, port, economy, coord, culture):
+        self.owner = owner
+        self.potential = potential
+        self.port = port
+        self.economy = economy
+        self.coord = coord
+        self.culture = culture                                                                                
+        
+provinces = [
+    [
+        [
+            Province(None, 4, 0, 2, None, "cul_weu"),
+            Province(None, 4, 0, 2, None, "cul_isl"),
+        ],
+        [
+            Province(None, 4, 1, 2, None, "cul_weu"),
+            Province(None, 4, 1, 2, None, "cul_weu"),
+            Province(None, 4, 1, 2, None, "cul_isl"),
+        ],
+        [
+            
+        ],
+        [
+            Province(None, 4, 2, 2, None, "cul_weu"),
+        ]
+    ]
+] 
 
+def input_loop(string:str, answers):
+    while True:
+        i = input(string)
+        if answers == None or i in answers:
+            return i
 
+def print_divider(length):
+    string = "X"
+    for x in range(length):
+        string = string + "-"
+    string = string + "X"
+    print(string)
 
+def print_map(map_mode, theatre):
+    if map_mode == 1:
+        print_divider(len(start[theatre][0])+2)
+        nyy = 0
+        for y in start[theatre]:
+            nyy = nyy + 1
+            nx = 0
+            string = "| "
+            for x in y:
+                if not (not (x == "_" or x == "+" or x == " ") and factions.get(x)):
+                    string += x
+                else:
+                    rx = provinces[theatre][nyy-1][nx].owner
+                    t = ""
+                    if rx == faction:
+                        t = get_faction_local(rx, "idu")
+                    else:
+                        t = get_faction_local(rx, "idl")
+                    string += t
+                    nx += 1
+            print(string + " |")
+        print_divider(len(start[theatre][0])+2)
+
+def Start():
+    
+    print("Language?: En/Sp")
+    #input_start_language = input_loop("""""", ["En","Sp"])
+    #language = input_start_language
+    print("Faction?")
+    input_start_country = input_loop("", get_keys(factions))
+    global faction
+    faction = input_start_country
+    ntheatre = -1
+    for theatre in start:
+        ntheatre += 1
+        ny = 0
+        for y in theatre:
+            ny += 1
+            nx = 0
+            mx = 0
+            for x in y:
+                if not (x == "_" or x == "+" or x == " ") and factions.get(x):
+                    nx += 1
+                    coord = Coordinate(nx,ny)
+                    #print("!"+x+"!")
+                    #print(coord.x, coord.y)
+                    provinces[ntheatre][ny-1][nx-1].owner = x
+                    provinces[ntheatre][ny-1][nx-1].coord = coord
+                    provinces[ntheatre][ny-1][nx-1].culture = factions[x].attributes.culture
+    print_map(1,0)
+    
+Start()
