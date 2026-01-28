@@ -264,6 +264,40 @@ def Start():
                     provinces[ntheatre][ny-1][nx-1].owner = x
                     provinces[ntheatre][ny-1][nx-1].coord = coord
                     provinces[ntheatre][ny-1][nx-1].culture = factions[x].attributes.culture
-    print_map(1,0)
+    
+    turn_loop = True
+    what_turn = 0
+    while turn_loop:
+        turn = True
+        what_turn += 1
+        print("Turn:", what_turn)
+        screen = "Main"
+        print("Screen:", screen)
+        while turn:
+            if screen == "Main":
+                input_main_generic = input_loop("(Press 0 for choices): ", ["0","1","End"])
+                if input_main_generic == "0":
+                    print("End: End Turn")
+                    print("0: Help")    
+                    print("1: Map")    
+                elif input_main_generic == "1":
+                    screen = "Map"
+                    print("Screen:", screen)
+                elif input_main_generic == "End":
+                    turn = False
+            if screen == "Map":
+                input_map_generic = input_loop("(Press 0 for choices):", ["End","Back","0","1"])
+                if input_map_generic == "Back":
+                    screen = "Main"
+                    print("Screen:", screen)
+                elif input_map_generic == "End":
+                    turn = False
+                elif input_map_generic == "0":
+                    print("End: End Turn")
+                    print("Back: Return to previous screen")
+                    print("0: Help")    
+                    print("1: Political Map Mode")
+                else:
+                    print_map(int(input_main_generic),0)
     
 Start()
