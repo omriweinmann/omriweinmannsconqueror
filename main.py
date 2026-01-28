@@ -90,6 +90,15 @@ localization = {
     "cul_weu" : {"En" : "Western European", "Sp" : "Europeo Occidental" },
     "cul_eeu" : {"En" : "Eastern European", "Sp" : "Europa del Este"},
     "cul_isl" : {"En" : "Islamic", "Sp" : "Islam"},
+
+    "End" : {"En" : "End", "Sp" : "Fin"},
+    "Back" : {"En" : "Back", "Sp" : "Atrás"},
+    "0" : {"En" : "0", "Sp" : "0"},
+    "1" : {"En" : "1", "Sp" : "1"},
+    "2" : {"En" : "2", "Sp" : "2"},
+    "zero_help" : {"En" : "0: Help", "Sp" : "0: Ayuda"},
+    "end_end_turn" : {"En" : "End: End Turn", "Sp" : "Fin: Finalizar turno"},
+    "back_return" : {"En" : "Back: Return to Previous Screen", "Sp" : "Atrás: Volver a la pantalla anterior"},
 }
 
 """
@@ -286,7 +295,7 @@ def Start():
                 elif input_main_generic == "End":
                     turn = False
             if screen == "Map":
-                input_map_generic = input_loop("(Press 0 for choices):", ["End","Back","0","1"])
+                input_map_generic = input_loop("(Press 0 for choices): ", ["End","Back","0","1"])
                 if input_map_generic == "Back":
                     screen = "Main"
                     print("Screen:", screen)
