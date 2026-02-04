@@ -407,18 +407,38 @@ def print_map(map_mode, theatre):
 							t = get_faction_local(rx.owner, "idl")
 						else:
 							t = "+"
-					key_list = []
+					key_list = [
+						"Uppercase Letter: Your faction",
+						"Lowercase Letter: Other factions",
+						"_: Bodies of water",
+						"+: Impassable territory"
+					]
 				elif map_mode == 2:
 					t = gl(str(rx.economy))
+					key_list = [
+						"Number: Economy Level"
+					]
 				elif map_mode == 3:
 					t = gl(str(rx.potential))
+					key_list = [
+						"Number: Potential Economy Level"
+					]
 				elif map_mode == 4:
 					t = gl(str(rx.port))
+					key_list = [
+						"0: Inland",
+						"1: Coastal",
+						"2: Port",
+						"3: International Port"
+					]
 				string += t
 				nx += 1
 		print(string + " |")
 		
 	print_divider(len(start[theatre][0])+2)
+	printe()
+	for s in key_list:
+		print(s)
 	printe()
 	
 def Start():
@@ -537,5 +557,7 @@ def Start():
 				elif input_economy_generic == gl("1"):
 					pass
 				elif input_economy_generic == gl("2"):
+					pass
+				elif input_economy_generic == gl("3"):
 					pass
 Start() 
