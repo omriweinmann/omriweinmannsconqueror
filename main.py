@@ -134,7 +134,7 @@ localization = {
 	"three_improve_economy_low" : {"En" : "3: Improve the economy of the poorest province", "Sp" : "3: Mejorar la economía de la provincia más pobre."},
 	"four_coastal_map" : {"En" : "4: Coastal Levels", "Sp" : "4: Niveles costeros"},
 	"what_theatre" : {"En" : "Theatre (0 for choices): ", "Sp" : "Teatro (0 para ver las opciones): "},
-	"ask_province" : {"En" : "Province (ex. 'a,a'): ", "Sp" : "Provincia (ej. 'a,a'): "},
+	"ask_coord" : {"En" : "Coordinates (ex. 'a,a'): ", "Sp" : "Coordenadas (ej. 'a,a'): "},
 	
 	"turn" : {"En" : "Turn", "Sp" : "Turno"},
 	"screen" : {"En" : "Screen", "Sp" : "Pantalla"},
@@ -151,7 +151,8 @@ localization = {
 	"you_have" : {"En" : "You have @one@ pounds", "Sp" : "Tienes @one@ libras"},
 	"no_own_province" : {"En" : "You do not own this province", "Sp" : "No eres dueño de esta provincia"},
 	"already_own_province" : {"En" : "You already own this province", "Sp" : "Ya eres dueño de esta provincia"},
-	"invalid_format_province" : {"En" : "Invalid Format (ex. 'a,a')", "Sp" : "Formato no válido (ej. 'a,a')"},
+	"invalid_format_coord" : {"En" : "Invalid Format (ex. 'a,a')", "Sp" : "Formato no válido (ej. 'a,a')"},
+	"invalid_province" : {"En" : "Invalid Province (May be water, or impassable)", "Sp" : "Provincia no válida (puede ser agua o intransitable)"},
 }
 
 def num_2_l(n):
@@ -159,6 +160,7 @@ def num_2_l(n):
 	number = int(n)
 	if number > 26:
 		b = '@'
+		number -= 26
 	return chr(ord(b)+number)
 
 
@@ -209,7 +211,12 @@ theatre_def = {
 }
 
 def get_localed(key):
-	return localization[key][language]
+	if key in localization:
+		k = localization[key]
+		if language in k:
+			l = k[language]
+			return l
+	return key
 
 def gl(k):
 	return get_localed(k)
@@ -383,7 +390,7 @@ def theatre_input_loop():
 				b = theatre_answered
 			return b
 
-def province_input_loop(type, faction)
+def province_input_loop(type, faction):
 	theatre = theatre_input_loop()
 	while True:
 		inp = input(gl("ask_coord"))
@@ -391,7 +398,7 @@ def province_input_loop(type, faction)
 		if not len(spl) == 2:
 			print(gl("invalid_format_province"))
 		else:
-			province = provinces[theatre][get_key_from_val(spl[1])-1][get_key_from_val(spl[0])-1]
+			province = provinces[theatre][ord(spl[0])-97][ord(spl[1])-97]
 			if type == 1 and not province.owner == faction:
 				print(gl("no_own_province"))
 			elif type == 2 and province.owner == faction:
@@ -418,7 +425,7 @@ def printe():
 	print("")
 
 def print_map(map_mode, theatre):
-	print_map_divider(len(start[theatre][0])+2)
+	print_divider(len(start[theatre][0])+2)
 	nyy = 0
 	key_list = []
 	for y in start[theatre]:
@@ -479,8 +486,7 @@ def print_map(map_mode, theatre):
 				string += t
 				nx += 1
 		print(string + " |")
-		
-	print_divider(len(start[theatre][0])+2)
+	print_map_divider(len(start[theatre][0])+2)
 	printe()
 	for s in key_list:
 		print(s)
@@ -511,8 +517,42 @@ def pay_input_loop(amount):
 	printe()
 	return False
 
-def province_input_loop(theatre, faction)
-
+def province_input_loop(type, f):
+	theatre = theatre_input_loop()
+	while not theatre == "Cancelled":
+		inp = input(gl("ask_coord"))
+		if inp == gl("Cancel"):
+			return "Cancelled"
+		spl = inp.split(",")
+		#print(spl)
+		if not len(spl) == 2:
+			print(gl("invalid_format_coord"))
+		else:
+			t = provinces[theatre]
+			ord_1 = ord(spl[1])-97
+			#print(ord_1)
+			if len(t) >= ord_1 + 1:
+				ord_0 = ord(spl[0])-97
+				#print(ord_0)
+				good_to_go = False
+				for iterate in t[ord_1]:
+					if iterate.coord.x == ord_0 + 1:
+						good_to_go = True
+						break
+				if good_to_go:
+					province = t[ord_1][ord_0]
+					if type == 1 and not province.owner == f:
+						print(gl("no_own_province"))
+					elif type == 2 and province.owner == f:
+						print(gl("already_own_province"))
+					else:
+						return province
+				else:
+					print(gl("invalid_province"))
+			else:
+				print(gl("invalid_province"))
+	return "Cancelled"
+	
 def Start():
 	print("Language?: En/Sp")
 	input_start_language = input_loop("""""", ["En","Sp"])
@@ -627,7 +667,14 @@ def Start():
 					print(gl("two_improve_economy_rng"))
 					print(gl("three_improve_economy_low"))
 				elif input_economy_generic == gl("1"):
-					pass
+					province = province_input_loop(1, faction)
+					if not province == "Cancelled":
+						coord = province.coord
+						the_str = gl(get_key_from_val(coord.theatre,theatre_def))
+						print(the_str+": ("+num_2_l(coord.x)+", "+num_2_l(coord.y)+"), Econ:"+str(province.economy))
+						if pay_input_loop(calc_economy_upgrade(province)):
+							print("Province economy has been improved")
+							provinces[coord.theatre][coord.y-1][coord.x-1].economy += 1
 				elif input_economy_generic == gl("2"):
 					province = random.choice(get_provinces_owned(faction, -7))
 					coord = province.coord
